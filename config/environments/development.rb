@@ -43,7 +43,21 @@ Rails.application.configure do
   config.assets.debug = true
 
   # Suppress logger output for asset requests.
-  config.assets.quiet = true
+  config.assets.quiet = false
+
+  config.logger = Logger.new(STDOUT)
+  # config.logger.level = Logger::ERROR
+
+  if ENV['DEV_PROFILING']=='true'
+    # Include or override settings that improve code profiling performance
+    config.assets.debug = false
+    config.assets.raise_runtime_errors = false
+    config.cache_classes = true
+    config.eager_load = true
+    config.active_record.migration_error = nil
+    config.lograge.enabled = true
+    config.log_level = :info
+  end
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
