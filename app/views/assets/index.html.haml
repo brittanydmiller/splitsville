@@ -1,1 +1,6 @@
 %h2 Assets
+- if @assets.present?
+  %dl
+  - @assets.each do |asset|
+    %dt= link_to asset.name, asset_path(asset)
+    %dd= asset.description

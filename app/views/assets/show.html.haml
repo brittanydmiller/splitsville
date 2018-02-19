@@ -1,1 +1,38 @@
-%h2 This Asset
+%h2
+  = @asset.name
+
+.back=link_to 'Back to Assets', assets_path
+.bills
+  %h3
+    = "Bills for #{@asset.name}"
+  - if @asset.bills.present?
+    - @asset.bills&.each do |bill|
+      =bill.name
+      %ul
+        %li= bill.amount
+        %li= bill.service_start
+        %li= bill.service_end
+
+%button Add Bill
+
+.form.hidden
+  =form_for Bill.new do |f|
+    %ul
+      %li
+        =f.label :name, 'Name'
+        =f.text_field :name
+      %li
+        =f.label :description, 'Description'
+        =f.text_field :description
+      %li
+        =f.label :service_start, 'Service Start Date'
+        =f.date_field :service_start
+      %li
+        =f.label :service_end, 'Service End Date'
+        =f.date_field :service_end
+      %li
+        =f.label :amount, 'Amount'
+        =f.number_field :amount, step: 0.01
+        =f.hidden_field :asset_id, value: @asset.id
+      %li
+        =f.submit 'Save Bill'
