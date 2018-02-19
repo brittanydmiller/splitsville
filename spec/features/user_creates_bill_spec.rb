@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 feature 'user creates a bill for an asset' do
+  before(:example) do
+    asset = create(:asset)
+  end
+
   scenario 'successfully' do
     visit '/assets/1'
     click_on 'Add Bill'
