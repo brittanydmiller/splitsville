@@ -10,8 +10,9 @@ end
 
 feature 'user visits asset show page' do
   scenario 'successfully' do
-    visit '/assets/1'
+    asset1 = create(:asset)
+    visit "/assets/#{asset1.id}"
     expect(page).to have_css 'h1', text: 'Splitsville'
-    expect(page).to have_css 'h2', text: 'This Asset'
+    expect(page).to have_css 'h2', text: 'Our Apartment'
   end
 end
