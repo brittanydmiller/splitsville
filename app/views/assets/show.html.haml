@@ -2,20 +2,21 @@
   = @asset.name
 
 .back=link_to 'Back to Assets', assets_path
-.bills
-  %h3
-    = "Bills for #{@asset.name}"
-  - if @asset.bills.present?
-    - @asset.bills&.each do |bill|
-      =bill.name
-      %ul
-        %li= bill.amount
-        %li= bill.service_start
-        %li= bill.service_end
 
-%button Add Bill
+- if @asset.bills.present?
+  .bills
+    %h3
+      = "Bills for #{@asset.name}"
+      - @asset.bills&.each do |bill|
+        =bill.name
+        %ul
+          %li= bill.amount
+          %li= bill.service_start
+          %li= bill.service_end
 
-.form.hidden
+%button.js-toggle-form Add Bill
+
+.form.hidden.new-bill-form
   =form_for Bill.new do |f|
     %ul
       %li
