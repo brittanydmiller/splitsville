@@ -109,103 +109,103 @@ require 'webmock/rspec'
 # require 'stub_helper'
 # AWS.stub!
 
-WebMock.disable_net_connect!(:allow_localhost => true)
-# Enable this block to debug WebMock captured requests
-#WebMock.after_request do |request_signature, response|
-#  unless request_signature.uri.host == '127.0.0.1'
-#    puts "Request #{request_signature} was made and #{response} was returned"
-#  end
-#end
+# WebMock.disable_net_connect!(:allow_localhost => true)
+# # Enable this block to debug WebMock captured requests
+# #WebMock.after_request do |request_signature, response|
+# #  unless request_signature.uri.host == '127.0.0.1'
+# #    puts "Request #{request_signature} was made and #{response} was returned"
+# #  end
+# #end
 
-Capybara.configure do |config|
-  config.match = :prefer_exact
-  config.ignore_hidden_elements = false
-end
+# Capybara.configure do |config|
+#   config.match = :prefer_exact
+#   config.ignore_hidden_elements = false
+# end
 
-DEBUG_DATABASE_CLEANER = ENV['DEBUG_DATABASE_CLEANER'] || false
+# DEBUG_DATABASE_CLEANER = ENV['DEBUG_DATABASE_CLEANER'] || false
 
-RSpec.configure do |config|
-  config.filter_run_excluding :broken => true
-  #config.deprecation_stream = 'log/deprecations.log'
-  config.raise_errors_for_deprecations!
-  config.include Rails.application.routes.url_helpers
-  config.include Devise::Test::ControllerHelpers, :type => :controller
-  config.include SignInHelpers, :type => :controller
-  config.include ControllerHelpers, :type => :controller
-  config.include AttributeNormalizer::RSpecMatcher, :type => :model
-  config.include ActiveSupport::Testing::TimeHelpers
-  config.include ActionView::TestCase::Behavior, :file_path => %r{spec/presenters}
-  config.example_status_persistence_file_path = './tmp/spec_failures.txt'
-  config.threadsafe = true
+# RSpec.configure do |config|
+#   config.filter_run_excluding :broken => true
+#   #config.deprecation_stream = 'log/deprecations.log'
+#   config.raise_errors_for_deprecations!
+#   config.include Rails.application.routes.url_helpers
+#   config.include Devise::Test::ControllerHelpers, :type => :controller
+#   config.include SignInHelpers, :type => :controller
+#   config.include ControllerHelpers, :type => :controller
+#   config.include AttributeNormalizer::RSpecMatcher, :type => :model
+#   config.include ActiveSupport::Testing::TimeHelpers
+#   config.include ActionView::TestCase::Behavior, :file_path => %r{spec/presenters}
+#   config.example_status_persistence_file_path = './tmp/spec_failures.txt'
+#   config.threadsafe = true
 
-  config.render_views
-  config.mock_with :rspec do |mocks|
-    mocks.verify_partial_doubles= true
-  end
-  config.order = 'random'
+#   config.render_views
+#   config.mock_with :rspec do |mocks|
+#     mocks.verify_partial_doubles= true
+#   end
+#   config.order = 'random'
 
-  # Hack to print a numeric spec number for each example group in a run
-  # config.add_setting(:current_spec, :default => 0)
-  # config.before(:context) do
-  # puts "Spec ##{config.current_spec= config.current_spec+1}"
-  # end
+#   # Hack to print a numeric spec number for each example group in a run
+#   # config.add_setting(:current_spec, :default => 0)
+#   # config.before(:context) do
+#   # puts "Spec ##{config.current_spec= config.current_spec+1}"
+#   # end
 
-  config.before(:suite) do
-    puts 'Doing before:suite clean with truncation' if DEBUG_DATABASE_CLEANER
-    DatabaseCleaner[:active_record].clean_with(:truncation)
-  end
+#   config.before(:suite) do
+#     puts 'Doing before:suite clean with truncation' if DEBUG_DATABASE_CLEANER
+#     DatabaseCleaner[:active_record].clean_with(:truncation)
+#   end
 
-  config.before(:context) do
-    puts 'Doing before:all :strategy => transaction' if DEBUG_DATABASE_CLEANER
-    # NOTE: will be reset to truncation for acceptance tests in a before:each block
-    DatabaseCleaner[:active_record].strategy = :transaction
-  end
+#   config.before(:context) do
+#     puts 'Doing before:all :strategy => transaction' if DEBUG_DATABASE_CLEANER
+#     # NOTE: will be reset to truncation for acceptance tests in a before:each block
+#     DatabaseCleaner[:active_record].strategy = :transaction
+#   end
 
-  config.before(:each, :capybara_feature => true) do
-    puts 'Doing before:each for capybara :strategy => truncation' if DEBUG_DATABASE_CLEANER
-    # NOTE: The acceptance specs used the truncation strategy so the server process has access
-    #       to records set up by the example
-    DatabaseCleaner[:active_record].strategy = :truncation, { :pre_count => true, :reset_ids => false }
-  end
+#   config.before(:each, :capybara_feature => true) do
+#     puts 'Doing before:each for capybara :strategy => truncation' if DEBUG_DATABASE_CLEANER
+#     # NOTE: The acceptance specs used the truncation strategy so the server process has access
+#     #       to records set up by the example
+#     DatabaseCleaner[:active_record].strategy = :truncation, { :pre_count => true, :reset_ids => false }
+#   end
 
-  config.before(:example) do |example|
-    puts "Doing before:each starting cleaner with #{DatabaseCleaner[:active_record].strategy.class.name}" if DEBUG_DATABASE_CLEANER
-    DatabaseCleaner[:active_record].start
-    enable_only_observers_specified_by_example(example)
-    enable_imminent_graduation_notification_only_for_its_specs(example)
-    RequestStore.store[:actor_id] = nil
-    RequestStore.store[:current_user_id] = nil
-  end
+#   config.before(:example) do |example|
+#     puts "Doing before:each starting cleaner with #{DatabaseCleaner[:active_record].strategy.class.name}" if DEBUG_DATABASE_CLEANER
+#     DatabaseCleaner[:active_record].start
+#     enable_only_observers_specified_by_example(example)
+#     enable_imminent_graduation_notification_only_for_its_specs(example)
+#     RequestStore.store[:actor_id] = nil
+#     RequestStore.store[:current_user_id] = nil
+#   end
 
-  config.after(:example) do
-    puts "Doing after:each clean with #{DatabaseCleaner[:active_record].strategy.class.name}" if DEBUG_DATABASE_CLEANER
-    DatabaseCleaner[:active_record].clean
-  end
+#   config.after(:example) do
+#     puts "Doing after:each clean with #{DatabaseCleaner[:active_record].strategy.class.name}" if DEBUG_DATABASE_CLEANER
+#     DatabaseCleaner[:active_record].clean
+#   end
 
-  config.after(:all, :require_cleanup) do
-    puts 'Doing after:all db truncation for :require_cleanup' if DEBUG_DATABASE_CLEANER
-    DatabaseCleaner[:active_record].clean_with(:truncation)
-  end
+#   config.after(:all, :require_cleanup) do
+#     puts 'Doing after:all db truncation for :require_cleanup' if DEBUG_DATABASE_CLEANER
+#     DatabaseCleaner[:active_record].clean_with(:truncation)
+#   end
 
-  # Enable this hook to track down specs that leak objects by setting a DEBUG_SPEC_LEAKS env variable.
-  # Switch to "--format documentation" in .rspec in conjunction with using the code below.
-  if ENV['DEBUG_SPEC_LEAKS']
-    config.append_after(:context) do
-      ::ActiveRecord::Base.descendants.each do |ar|
-        next if ar.name == 'ActiveRecord::SchemaMigration'
-        next if ar.name == 'PgSearch::Document'
-        if !ar.abstract_class && ar.count > 0
-          puts "\n!!!!!! Leaked #{ar.name} : #{ar.count}"
-          # byebug # To pause execution and make locating the first leaking spec easier.
-        end
-      end
-    end
-  end
+#   # Enable this hook to track down specs that leak objects by setting a DEBUG_SPEC_LEAKS env variable.
+#   # Switch to "--format documentation" in .rspec in conjunction with using the code below.
+#   if ENV['DEBUG_SPEC_LEAKS']
+#     config.append_after(:context) do
+#       ::ActiveRecord::Base.descendants.each do |ar|
+#         next if ar.name == 'ActiveRecord::SchemaMigration'
+#         next if ar.name == 'PgSearch::Document'
+#         if !ar.abstract_class && ar.count > 0
+#           puts "\n!!!!!! Leaked #{ar.name} : #{ar.count}"
+#           # byebug # To pause execution and make locating the first leaking spec easier.
+#         end
+#       end
+#     end
+#   end
 
-  config.after(:suite) do
-    puts 'Doing after:suite db truncation' if DEBUG_DATABASE_CLEANER
-    DatabaseCleaner[:active_record].clean_with(:truncation)
-  end
+#   config.after(:suite) do
+#     puts 'Doing after:suite db truncation' if DEBUG_DATABASE_CLEANER
+#     DatabaseCleaner[:active_record].clean_with(:truncation)
+#   end
 
   # ---------------------------------------------
 end
